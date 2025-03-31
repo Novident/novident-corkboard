@@ -39,4 +39,4 @@ We greatly appreciate your time and effort.
 
 To keep the project consistent and maintainable, we have a few guidelines that we ask all contributors to follow. These guidelines help ensure that everyone can understand and work with the code easier.
 
-See [Contributing](https://github.com/Novident/novident-tree-view/blob/master/CONTRIBUTING.md) for more details.
+See [Contributing](https://github.com/Novident/novident-corkboard/blob/master/CONTRIBUTING.md) for more details.
