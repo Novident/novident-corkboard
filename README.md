@@ -7,11 +7,11 @@ Novident give us a corkboard that is the key visual tool for organizing and stru
 
 ## 💡 What is Corkboard?
 
-- **Visual Tabs:** Each tab displays a title and a summary (synopsis) of the associated content. For example, in a novel, each tab could be a scene with notes about its plot or characters.
+- **Visual Tabs:** Each tab displays can displays the content associated with the Node passed. For example, in a novel, each tab could be a scene with notes about its plot or characters.
 
 - **Flexibility:** Tabs can be rearranged by dragging and dropping, allowing you to experiment with the structure of your project without altering the entire text.
 
-- **Integration:** Each tab is linked to a document within Scrivener. Clicking on one takes you to the full text for editing.
+- **Integration:** Each tab is linked to a Node within the novident-nodes implementation.
 
 ## 📌 Corkboard Modes
 
