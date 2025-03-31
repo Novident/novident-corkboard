@@ -1,0 +1,27 @@
+name: novident_corkboard
+description: "A new Flutter package project."
+version: 1.0.0
+homepage:
+
+environment:
+  sdk: ">=3.4.3 <4.0.0"
+  flutter: ">=1.17.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  novident_nodes:
+    git:
+      url: https://github.com/Novident/novident-nodes.git
+      ref: master
+  meta: ^1.16.0
+  collection: ^1.19.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+
+flutter:
+
