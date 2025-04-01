@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:novident_corkboard/novident_corkboard.dart';
 
 void main() {
   runApp(const MyApp());
