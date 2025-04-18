@@ -4,7 +4,11 @@ import 'package:novident_corkboard/novident_corkboard.dart';
 import 'package:novident_nodes/novident_nodes.dart';
 
 class Folder extends NodeContainer
-    implements OffsetManagerMixin, CardIndexPositionMixin {
+    implements
+        OffsetManagerMixin,
+        CardIndexPositionMixin,
+        PersistentViewModeMixin,
+        LabelManagerMixin {
   Folder({
     required super.children,
     required super.details,
@@ -37,14 +41,14 @@ class Folder extends NodeContainer
   }
 
   @override
-  set cardIndex(int index) {}
+  int get nodeCardIndex => -1;
 
   @override
-  set cardOffset(Offset offset) {}
+  Offset get nodeCardOffset => Offset.zero;
 
   @override
-  int get cardIndex => 1;
+  String get nodeLabel => '';
 
   @override
-  Offset get cardOffset => Offset.zero;
+  CorkboardViewMode get nodeLastMode => CorkboardViewMode.corkboard;
 }

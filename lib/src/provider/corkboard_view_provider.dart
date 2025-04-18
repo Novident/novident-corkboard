@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:novident_corkboard/src/common/enums/modes.dart';
-import 'package:novident_corkboard/src/corkboard_controller.dart';
+import 'package:novident_corkboard/src/controller/corkboard_controller.dart';
 
 class CorkboardViewProvider extends InheritedWidget {
   final CorkboardViewMode viewMode;

@@ -14,10 +14,7 @@ dependencies:
   cupertino_icons: ^1.0.8
   novident_corkboard:
     path: ../
-  novident_nodes:
-    git:
-      url: https://github.com/Novident/novident-nodes.git
-      ref: master
+  novident_nodes: ^1.0.0
   appflowy_editor: ^5.1.0
 
 dev_dependencies:

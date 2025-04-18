@@ -4,22 +4,35 @@ import 'package:novident_corkboard/novident_corkboard.dart';
 import 'package:novident_nodes/novident_nodes.dart';
 
 class Document extends Node
-    implements OffsetManagerMixin, CardIndexPositionMixin {
+    implements
+        OffsetManagerMixin,
+        CardIndexPositionMixin,
+        PersistentViewModeMixin,
+        LabelManagerMixin {
+  final String label;
+  final Offset offset;
+  final int cardIndex;
+  final CorkboardViewMode viewMode;
   Document({
     required super.details,
-  });
+    this.cardIndex = 0,
+    this.label = '',
+    Offset? offset,
+    CorkboardViewMode? viewMode,
+  })  : offset = offset ?? Offset.zero,
+        viewMode = viewMode ?? CorkboardViewMode.single;
 
   @override
-  set cardIndex(int index) {}
+  int get nodeCardIndex => cardIndex;
 
   @override
-  set cardOffset(Offset offset) {}
+  Offset get nodeCardOffset => offset;
 
   @override
-  int get cardIndex => 1;
+  String get nodeLabel => label;
 
   @override
-  Offset get cardOffset => Offset.zero;
+  CorkboardViewMode get nodeLastMode => viewMode;
 
   @override
   Document clone() {
@@ -41,45 +54,30 @@ class Document extends Node
   }
 
   @override
+  int countAllNodes({required Predicate countNode}) => countNode(this) ? 1 : 0;
+
+  @override
+  int countNodes({required Predicate countNode}) => countNode(this) ? 1 : 0;
+
+  @override
+  bool deepExist(String id) => this.id == id;
+
+  @override
+  bool exist(String id) => this.id == id;
+
+  @override
+  Node? visitAllNodes({required Predicate shouldGetNode}) =>
+      shouldGetNode(this) ? this : null;
+
+  @override
+  Node? visitNode({required Predicate shouldGetNode}) =>
+      shouldGetNode(this) ? this : null;
+
+  @override
   bool operator ==(covariant Node other) {
     throw UnimplementedError();
   }
 
   @override
   int get hashCode => throw UnimplementedError();
-
-  @override
-  int countAllNodes({required Predicate countNode}) {
-    // TODO: implement countAllNodes
-    throw UnimplementedError();
-  }
-
-  @override
-  int countNodes({required Predicate countNode}) {
-    // TODO: implement countNodes
-    throw UnimplementedError();
-  }
-
-  @override
-  bool deepExist(String id) {
-    // TODO: implement deepExist
-    throw UnimplementedError();
-  }
-
-  @override
-  bool exist(String id) {
-    // TODO: implement exist
-    throw UnimplementedError();
-  }
-
-  @override
-  Node? visitAllNodes({required Predicate shouldGetNode}) {
-    throw UnimplementedError();
-  }
-
-  @override
-  Node? visitNode({required Predicate shouldGetNode}) {
-    // TODO: implement visitNode
-    throw UnimplementedError();
-  }
 }
