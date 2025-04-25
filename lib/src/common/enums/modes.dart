@@ -1,5 +1,6 @@
 enum CorkboardViewMode {
   corkboard(name: 'corkboard'),
+  corkboardFreeform(name: 'corkboardFreeform'),
   single(name: 'single'),
   outliner(name: 'outliner');
 
@@ -11,5 +12,6 @@ enum CorkboardViewMode {
 extension EasyCorkboardViewItemAccess on CorkboardViewMode {
   bool get isSingleMode => this == CorkboardViewMode.single;
   bool get isCorkboard => this == CorkboardViewMode.corkboard;
+  bool get isCorkboardFreeForm => this == CorkboardViewMode.corkboardFreeform;
   bool get isOutliner => this == CorkboardViewMode.outliner;
 }

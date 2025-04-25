@@ -1,3 +1,6 @@
+import 'package:flutter/material.dart';
+
 mixin CardIndexPositionMixin {
-  int get nodeCardIndex;
+  ValueNotifier<int> get nodeCardIndex;
+  set setNewCardIndex(int index);
 }

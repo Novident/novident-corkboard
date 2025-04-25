@@ -5,7 +5,7 @@ import 'package:novident_corkboard/src/common/mixins/mixins.dart';
 import 'package:novident_nodes/novident_nodes.dart';
 
 class NodeMock extends Node
-   with 
+    with
         OffsetManagerMixin,
         CardIndexPositionMixin,
         PersistentViewModeMixin,

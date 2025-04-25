@@ -1,3 +1,6 @@
+import 'package:flutter/cupertino.dart';
+
 mixin LabelManagerMixin {
-  String get nodeLabel;
+  ValueNotifier<String> get nodeLabel;
+  set setNewLabel(String label);
 }

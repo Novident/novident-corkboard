@@ -14,8 +14,9 @@ dependencies:
   cupertino_icons: ^1.0.8
   novident_corkboard:
     path: ../
-  novident_nodes: ^1.0.0
-  appflowy_editor: ^5.1.0
+  novident_nodes: ^1.1.2
+  novident_tree_view: ^1.0.1
+  appflowy_editor: ^5.2.0
 
 dev_dependencies:
   flutter_test:

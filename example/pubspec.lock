@@ -5,10 +5,10 @@ packages:
     dependency: "direct main"
     description:
       name: appflowy_editor
-      sha256: ce0b9170caca9bfbd525bd924c94733445c1c22137275f8c08c539b31585d0b5
+      sha256: "77e7a8da4474b3ee95aee860d782a48400ed57bbf4f8bd574231cfb21218dabb"
       url: "https://pub.dev"
     source: hosted
-    version: "5.1.0"
+    version: "5.2.0"
   archive:
     dependency: transitive
     description:
@@ -371,10 +371,18 @@ packages:
     dependency: "direct main"
     description:
       name: novident_nodes
-      sha256: cefa13f551de7ca57c2b55e067dcc7560141bc9a6cec94466fadc0e2c5564cc4
+      sha256: "898717de274a1130e37af2aa8c218d33de037ee711d3996272d2072d46698e7a"
       url: "https://pub.dev"
     source: hosted
-    version: "1.0.0"
+    version: "1.1.2"
+  novident_tree_view:
+    dependency: "direct main"
+    description:
+      name: novident_tree_view
+      sha256: "21b3ca0a5da3c77136d984a801abc040b57a2595648c9d0a973020cb401c2084"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.1"
   numerus:
     dependency: transitive
     description:

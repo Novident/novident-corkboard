@@ -1,10 +1,11 @@
 import 'package:example/src/domain/entities/document.dart';
+import 'package:example/src/domain/entities/folder.dart';
 import 'package:flutter/material.dart';
 import 'package:novident_corkboard/novident_corkboard.dart';
 import 'package:novident_nodes/novident_nodes.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -13,60 +14,77 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-      ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      title: 'Canvas Infinito con Objetos',
+      home: ExampleWidget(),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  final String title;
+class ExampleWidget extends StatefulWidget {
+  const ExampleWidget({
+    super.key,
+  });
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  State<ExampleWidget> createState() => _ExampleWidgetState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  final ScrollController _verticalScrollController = ScrollController();
-  final ScrollController _horizontalScrollController = ScrollController();
+class _ExampleWidgetState extends State<ExampleWidget> {
+  final ValueNotifier<CardCorkboardOptions> _options =
+      ValueNotifier(CardCorkboardOptions.starter());
+
+  final Folder folder = Folder(
+    details: NodeDetails.zero(),
+    children: <Node>[
+      Document(
+        details: NodeDetails.zero(),
+        offset: Offset(100, 100),
+      ),
+      Document(
+        details: NodeDetails.zero(),
+        offset: Offset(110, 110),
+      ),
+    ],
+    viewMode: CorkboardViewMode.corkboardFreeform,
+  );
+
   @override
   Widget build(BuildContext context) {
-    return CorkboardViewProvider(
-      viewMode: CorkboardViewMode.corkboard,
-      controller: CorkboardController(
-        node: ValueNotifier(Document(details: NodeDetails.zero())),
-        selectedNodes: [],
-        labels: {},
-        options: CorkboardOptions.starter(),
-      ),
-      child: Scaffold(
-        appBar: AppBar(
-          backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-          title: Text(widget.title),
-        ),
-        body: Scrollbar(
-          controller: _horizontalScrollController,
-          trackVisibility: true,
-          thumbVisibility: true,
-          scrollbarOrientation: ScrollbarOrientation.top,
-          child: SingleChildScrollView(
-            controller: _verticalScrollController,
-            child: Stack(
-              fit: StackFit.passthrough,
-              children: <Widget>[
-                Text(
-                  'Works dskja dksajksdaj sdakdsakdsakdsajjkdsa dskaj dsaksd aksdaj kjdas kjdsa kdjsa dsakj '
-                  'daskj dsakjsda kjdas kjdsa kjdsa kjdaskdjsadkasjdaskjda jkda kjdsa kjdsa kjdsakjdsadkjsa dsakj dsakjdsa kjdsa '
-                  'kdsakdsakjdsasd adsa jkjdsa dskj dsakjdsakjsdakjdaskjdas sdakdaksjdakjdaskjdsa jkdsa k',
-                ),
-              ],
-            ),
-          ),
+    return Scaffold(
+      appBar: AppBar(title: Text('Free form example')),
+      body: NovidentCorkboard(
+        node: folder,
+        configuration: CorkboardConfiguration(
+          debugMode: true,
+          allowZoom: true,
+          cardWidget: (
+            BuildContext context,
+            Node node,
+            bool isSelected,
+            BoxConstraints constraints,
+            void Function() selectThis,
+          ) {
+            return DecoratedBox(
+              decoration: isSelected
+                  ? BoxDecoration(
+                      border: Border.fromBorderSide(
+                        BorderSide(
+                          width: 2.0,
+                          color: Colors.blueAccent,
+                        ),
+                      ),
+                    )
+                  : BoxDecoration(),
+              position: DecorationPosition.foreground,
+              child: Container(
+                constraints: constraints,
+                color: Colors.red,
+                child: Text(
+                    'Object: ${(node as OffsetManagerMixin).nodeCardOffset.value}'),
+              ),
+            );
+          },
+          cardCorkboardOptions: _options,
         ),
       ),
     );

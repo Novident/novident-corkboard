@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:novident_corkboard/novident_corkboard.dart';
-import 'package:novident_corkboard/src/widgets/configuration/corkboard_configuration.dart';
-import 'package:novident_corkboard/src/widgets/corkboard/corkboard.dart';
+import 'package:novident_nodes/novident_nodes.dart';
 
 class NovidentCorkboard extends StatefulWidget {
+  final Node node;
   final CorkboardConfiguration configuration;
   const NovidentCorkboard({
     super.key,
     required this.configuration,
+    required this.node,
   });
 
   @override
@@ -15,19 +16,50 @@ class NovidentCorkboard extends StatefulWidget {
 }
 
 class _NovidentCorkboardState extends State<NovidentCorkboard> {
+  Node get node => widget.node;
+
   @override
   Widget build(BuildContext context) {
-    final CorkboardViewProvider provider =
-        CorkboardViewProvider.of(context, listen: true);
-    if (provider.viewMode.isSingleMode) {}
-    if (provider.viewMode.isOutliner) {}
-    if (provider.viewMode.isCorkboard) {
-      return Corkboard(
-        configuration: widget.configuration,
-      );
-    }
-    return Center(
-      child: Text('Not founded ${provider.viewMode.name} implementation view'),
+    return ListenableBuilder(
+      listenable: node,
+      builder: (BuildContext context, Widget? _) {
+        if (node is! OffsetManagerMixin ||
+            node is! CardIndexPositionMixin ||
+            node is! LabelManagerMixin ||
+            node is! PersistentViewModeMixin) {
+          throw FlutterErrorDetails(
+            exception: Exception(''),
+            library: 'novident_corkboard',
+            context: ErrorDescription(
+                'Node of type ${node.runtimeType} has no implemented some of the '
+                'needed mixins: [OffsetManagerMixin, CardIndexPositionMixin, '
+                'LabelManagerMixin, PersistentViewModeMixin]'),
+          );
+        }
+        final ValueNotifier<CorkboardViewMode> viewMode =
+            (node as PersistentViewModeMixin).lastViewMode;
+        return ValueListenableBuilder<CorkboardViewMode>(
+            valueListenable: viewMode,
+            builder: (BuildContext context, CorkboardViewMode value, _) {
+              if (value.isSingleMode) {}
+
+              if (node is! NodeContainer) {
+                return widget.configuration.onNoAvailableViewForNode
+                        ?.call(node) ??
+                    Center(
+                      child: Text(
+                        '"${node.runtimeType}" has no '
+                        'subnodes to be showed',
+                      ),
+                    );
+              }
+              if (value.isOutliner) {}
+              return Corkboard(
+                configuration: widget.configuration,
+                node: node,
+              );
+            });
+      },
     );
   }
 }

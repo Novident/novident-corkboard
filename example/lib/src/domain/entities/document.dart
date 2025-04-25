@@ -1,5 +1,4 @@
-import 'dart:ui';
-
+import 'package:flutter/material.dart';
 import 'package:novident_corkboard/novident_corkboard.dart';
 import 'package:novident_nodes/novident_nodes.dart';
 
@@ -9,35 +8,84 @@ class Document extends Node
         CardIndexPositionMixin,
         PersistentViewModeMixin,
         LabelManagerMixin {
-  final String label;
-  final Offset offset;
-  final int cardIndex;
-  final CorkboardViewMode viewMode;
+  final ValueNotifier<String> _label;
+  final ValueNotifier<Offset> _offset;
+  final ValueNotifier<int> _cardIndex;
+  final ValueNotifier<CorkboardViewMode> _viewMode;
+  final ValueNotifier<DateTime> _lastCardOffsetModification;
   Document({
     required super.details,
-    this.cardIndex = 0,
-    this.label = '',
+    int cardIndex = -1,
+    String label = '',
     Offset? offset,
+    DateTime? lastCardOffsetModification,
     CorkboardViewMode? viewMode,
-  })  : offset = offset ?? Offset.zero,
-        viewMode = viewMode ?? CorkboardViewMode.single;
+  })  : _offset = ValueNotifier(offset ?? Offset.zero),
+        _viewMode = ValueNotifier(viewMode ?? CorkboardViewMode.single),
+        _label = ValueNotifier(label),
+        _cardIndex = ValueNotifier(cardIndex),
+        _lastCardOffsetModification = ValueNotifier(
+          lastCardOffsetModification ?? DateTime.now(),
+        );
 
   @override
-  int get nodeCardIndex => cardIndex;
+  set setNewCardIndex(int index) {
+    if (index == _cardIndex.value) return;
+    _cardIndex.value = index;
+  }
 
   @override
-  Offset get nodeCardOffset => offset;
+  set setNewLabel(String label) {
+    if (label == _label.value) return;
+
+    _label.value = label;
+  }
 
   @override
-  String get nodeLabel => label;
+  set setNewViewMode(CorkboardViewMode mode) {
+    if (mode == _viewMode.value) return;
+
+    _viewMode.value = mode;
+  }
 
   @override
-  CorkboardViewMode get nodeLastMode => viewMode;
+  set setCardOffset(Offset offset) {
+    _offset.value = offset;
+    _lastCardOffsetModification.value = DateTime.now();
+  }
+
+  @override
+  ValueNotifier<int> get nodeCardIndex => _cardIndex;
+
+  @override
+  ValueNotifier<Offset> get nodeCardOffset => _offset;
+
+  @override
+  ValueNotifier<String> get nodeLabel => _label;
+
+  @override
+  ValueNotifier<CorkboardViewMode> get lastViewMode => _viewMode;
+
+  @override
+  ValueNotifier<DateTime> get lastCardOffsetModification =>
+      _lastCardOffsetModification;
 
   @override
   Document clone() {
     return Document(
       details: details,
+      cardIndex: _cardIndex.value,
+      label: _label.value,
+      offset: _offset.value,
+      lastCardOffsetModification: _lastCardOffsetModification.value,
+      viewMode: _viewMode.value,
+    );
+  }
+
+  @override
+  Node cloneWithNewLevel(int level) {
+    return copyWith(
+      details: details.cloneWithNewLevel(level),
     );
   }
 
@@ -45,39 +93,49 @@ class Document extends Node
   Document copyWith({NodeDetails? details}) {
     return Document(
       details: details ?? this.details,
+      label: _label.value,
+      offset: _offset.value,
+      viewMode: _viewMode.value,
+      cardIndex: _cardIndex.value,
+      lastCardOffsetModification: _lastCardOffsetModification.value,
     );
   }
 
   @override
-  Map<String, dynamic> toJson() {
-    throw UnimplementedError();
+  void dispose() {
+    super.dispose();
+    _offset.dispose();
+    _label.dispose();
+    _lastCardOffsetModification.dispose();
+    _cardIndex.dispose();
+    _viewMode.dispose();
   }
 
   @override
-  int countAllNodes({required Predicate countNode}) => countNode(this) ? 1 : 0;
-
-  @override
-  int countNodes({required Predicate countNode}) => countNode(this) ? 1 : 0;
-
-  @override
-  bool deepExist(String id) => this.id == id;
-
-  @override
-  bool exist(String id) => this.id == id;
-
-  @override
-  Node? visitAllNodes({required Predicate shouldGetNode}) =>
-      shouldGetNode(this) ? this : null;
-
-  @override
-  Node? visitNode({required Predicate shouldGetNode}) =>
-      shouldGetNode(this) ? this : null;
+  Map<String, dynamic> toJson() {
+    return {};
+  }
 
   @override
   bool operator ==(covariant Node other) {
-    throw UnimplementedError();
+    if (other is! Document) {
+      return false;
+    }
+    return details == other.details &&
+        _offset == other._offset &&
+        _label == other._label &&
+        _viewMode == other._viewMode &&
+        _cardIndex == other._cardIndex &&
+        _lastCardOffsetModification == other._lastCardOffsetModification;
   }
 
   @override
-  int get hashCode => throw UnimplementedError();
+  int get hashCode => Object.hashAllUnordered([
+        details,
+        _offset,
+        _label,
+        _lastCardOffsetModification,
+        _viewMode,
+        _cardIndex,
+      ]);
 }
