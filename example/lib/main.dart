@@ -42,7 +42,15 @@ class _ExampleWidgetState extends State<ExampleWidget> {
       ),
       Document(
         details: NodeDetails.zero(),
-        offset: Offset(110, 110),
+        offset: Offset(130, 130),
+      ),
+      Document(
+        details: NodeDetails.zero(),
+        offset: Offset(160, 160),
+      ),
+      Document(
+        details: NodeDetails.zero(),
+        offset: Offset(190, 190),
       ),
     ],
     viewMode: CorkboardViewMode.corkboardFreeform,
@@ -57,6 +65,7 @@ class _ExampleWidgetState extends State<ExampleWidget> {
         configuration: CorkboardConfiguration(
           debugMode: true,
           allowZoom: true,
+          cardCorkboardOptions: _options,
           cardWidget: (
             BuildContext context,
             Node node,
@@ -84,7 +93,6 @@ class _ExampleWidgetState extends State<ExampleWidget> {
               ),
             );
           },
-          cardCorkboardOptions: _options,
         ),
       ),
     );

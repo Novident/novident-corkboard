@@ -62,8 +62,8 @@ class _NodeFreeFormIndexCardState extends State<NodeFreeFormIndexCard> {
 
     return Rect.fromCenter(
       center: screenPos,
-      width: isDebugModeEnable ? size.width * 2 : size.width,
-      height: isDebugModeEnable ? size.height * 2 : size.height,
+      width: (isDebugModeEnable ? size.width * 3 : size.width) * widget.scale,
+      height: (isDebugModeEnable ? size.height * 3 : size.height) * widget.scale,
     );
   }
 
@@ -120,14 +120,16 @@ class _NodeFreeFormIndexCardState extends State<NodeFreeFormIndexCard> {
               },
               child: Column(
                 children: [
-                  Text('X: ${_currentOffset.dx}'),
-                  Text('Y: ${_currentOffset.dy}'),
+                  Text('X: ${_currentOffset.dx.toStringAsFixed(3)}'),
+                  Text('Y: ${_currentOffset.dy.toStringAsFixed(3)}'),
                   Text('Being dragged: ${isDragging ? 'Yes' : 'No'}'),
                   widget.configs.cardWidget(
                     context,
                     node,
                     value?.id == node.id,
-                    BoxConstraints.tight(cardSize),
+                    BoxConstraints.tight(
+                      cardSize,
+                    ),
                     () {
                       if (value?.id != node.id) {
                         listener.selection.value = node;

@@ -19,6 +19,7 @@ class Corkboard extends StatefulWidget {
 
 class _CorkboardState extends State<Corkboard> {
   NodeContainer get container => widget.node as NodeContainer;
+
   @override
   Widget build(BuildContext context) {
     return FreeFormCardSelectedListener(
@@ -48,9 +49,11 @@ class _FreeFormCorkboardState extends State<_FreeFormCorkboard> {
   Offset _viewOffset = Offset.zero;
   Offset _startPanOffset = Offset.zero;
   Offset _startFocalPoint = Offset.zero;
+  late List<Node> _children;
 
   @override
   void initState() {
+    _children = <Node>[...widget.container.children];
     super.initState();
   }
 
@@ -64,10 +67,11 @@ class _FreeFormCorkboardState extends State<_FreeFormCorkboard> {
     );
   }
 
-  final ValueNotifier<bool> _isViewportEmptyNotifier =
-      ValueNotifier<bool>(false);
-  List<Node> get children => widget.container.children;
+  final ValueNotifier<bool> _isViewportEmptyNotifier = ValueNotifier<bool>(false);
 
+  List<Node> get children => _children;
+
+  /// Checks if we have an object into the viewport
   void _isViewportEmpty(double scale, Size cardSizes, Size viewportSize) {
     if (children.isEmpty) return;
     final Rect worldViewportRect = Rect.fromLTWH(
@@ -91,12 +95,10 @@ class _FreeFormCorkboardState extends State<_FreeFormCorkboard> {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
-        final Size viewportSize =
-            Size(constraints.maxWidth, constraints.maxHeight);
+        final Size viewportSize = Size(constraints.maxWidth, constraints.maxHeight);
         return ValueListenableBuilder<CardCorkboardOptions>(
             valueListenable: widget.configuration.cardCorkboardOptions,
-            builder:
-                (BuildContext context, CardCorkboardOptions value, Widget? __) {
+            builder: (BuildContext context, CardCorkboardOptions value, Widget? __) {
               final Size cardSize = value.size;
               final double scale = value.ratio;
               return Stack(
@@ -107,8 +109,7 @@ class _FreeFormCorkboardState extends State<_FreeFormCorkboard> {
                     child: ValueListenableBuilder<Node?>(
                         valueListenable:
                             FreeFormCardSelectedListener.of(context).selection,
-                        builder:
-                            (BuildContext context, Node? value, Widget? _) {
+                        builder: (BuildContext context, Node? value, Widget? _) {
                           return GestureDetector(
                             onScaleStart: (ScaleStartDetails details) {
                               _startPanOffset = _viewOffset;
@@ -119,11 +120,10 @@ class _FreeFormCorkboardState extends State<_FreeFormCorkboard> {
                             onScaleUpdate: (ScaleUpdateDetails details) {
                               if (value == null) {
                                 setState(() {
-                                  _isViewportEmpty(
-                                      scale, cardSize, viewportSize);
+                                  _isViewportEmpty(scale, cardSize, viewportSize);
                                   // move canvas
-                                  final Offset delta = (_startFocalPoint -
-                                      details.localFocalPoint);
+                                  final Offset delta =
+                                      (_startFocalPoint - details.localFocalPoint);
                                   _viewOffset = _startPanOffset + delta / scale;
 
                                   // change the zoom of the current view only on
@@ -132,25 +132,19 @@ class _FreeFormCorkboardState extends State<_FreeFormCorkboard> {
                                     if (details.scale == scale) return;
                                     if (details.scale >= minScale &&
                                         details.scale <= maxScale) {
-                                      final double newScale =
-                                          scale * details.scale;
+                                      final double newScale = scale * details.scale;
                                       final Offset focalWorldBefore =
-                                          _screenToWorld(
-                                              scale, details.localFocalPoint);
+                                          _screenToWorld(scale, details.localFocalPoint);
 
-                                      widget.configuration.cardCorkboardOptions
-                                              .value =
-                                          widget.configuration
-                                              .cardCorkboardOptions.value
+                                      widget.configuration.cardCorkboardOptions.value =
+                                          widget.configuration.cardCorkboardOptions.value
                                               .copyWith(
                                         ratio: newScale,
                                       );
 
-                                      final Offset focalWorldAfter =
-                                          _screenToWorld(newScale,
-                                              details.localFocalPoint);
-                                      _viewOffset +=
-                                          (focalWorldBefore - focalWorldAfter);
+                                      final Offset focalWorldAfter = _screenToWorld(
+                                          newScale, details.localFocalPoint);
+                                      _viewOffset += (focalWorldBefore - focalWorldAfter);
                                     }
                                   }
                                 });
@@ -190,11 +184,9 @@ class _FreeFormCorkboardState extends State<_FreeFormCorkboard> {
                             if (scale != value) {
                               setState(
                                 () {
-                                  widget.configuration.cardCorkboardOptions
-                                          .value =
-                                      widget.configuration.cardCorkboardOptions
-                                          .value
-                                          .copyWith(
+                                  widget.configuration.cardCorkboardOptions.value = widget
+                                      .configuration.cardCorkboardOptions.value
+                                      .copyWith(
                                     ratio: value,
                                   );
                                 },
@@ -215,23 +207,31 @@ class _FreeFormCorkboardState extends State<_FreeFormCorkboard> {
                         const SizedBox(width: 5),
                         Slider(
                           min: 40,
-                          max: 150,
+                          max: 200,
                           value: value.size.height,
                           allowedInteraction: SliderInteraction.slideOnly,
                           onChanged: (double change) {
                             if (value.size.height != change) {
                               setState(() {
-                                widget.configuration.cardCorkboardOptions
-                                        .value =
-                                    widget.configuration.cardCorkboardOptions
-                                        .value
-                                        .copyWith(
+                                widget.configuration.cardCorkboardOptions.value = widget
+                                    .configuration.cardCorkboardOptions.value
+                                    .copyWith(
                                   size: Size(value.size.width, change),
                                 );
                               });
                             }
                           },
                         ),
+                      ],
+                    ),
+                  ),
+                  Positioned(
+                    left: constraints.maxWidth * 0.70,
+                    bottom: 140,
+                    child: Column(
+                      children: <Widget>[
+                        Text('View dx position: ${_viewOffset.dx.toStringAsFixed(4)}'),
+                        Text('View dy position: ${_viewOffset.dy.toStringAsFixed(4)}'),
                       ],
                     ),
                   ),
@@ -244,10 +244,9 @@ class _FreeFormCorkboardState extends State<_FreeFormCorkboard> {
                         if (value) {
                           return InkWell(
                             onTap: () {
-                              _viewOffset =
-                                  (children.last as OffsetManagerMixin)
-                                      .nodeCardOffset
-                                      .value;
+                              _viewOffset = (children.last as OffsetManagerMixin)
+                                  .nodeCardOffset
+                                  .value;
                               setState(() {});
                             },
                             child: Container(
@@ -258,8 +257,7 @@ class _FreeFormCorkboardState extends State<_FreeFormCorkboard> {
                               ),
                               child: Text(
                                 'No hay objetos visibles',
-                                style: TextStyle(
-                                    color: Colors.white, fontSize: 18),
+                                style: TextStyle(color: Colors.white, fontSize: 18),
                               ),
                             ),
                           );
@@ -295,12 +293,10 @@ class _FreeFormCorkboardState extends State<_FreeFormCorkboard> {
     if (widget.configuration.focusCardOnPress) {
       setState(() {
         children.sort(
-          (Node a, Node b) => (a as OffsetManagerMixin)
-              .lastCardOffsetModification
-              .value
-              .compareTo(
-                (b as OffsetManagerMixin).lastCardOffsetModification.value,
-              ),
+          (Node a, Node b) =>
+              (a as OffsetManagerMixin).lastCardOffsetModification.value.compareTo(
+                    (b as OffsetManagerMixin).lastCardOffsetModification.value,
+                  ),
         );
       });
     }

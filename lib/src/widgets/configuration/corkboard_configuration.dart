@@ -67,11 +67,12 @@ class CardCorkboardOptions {
   });
 
   CardCorkboardOptions.starter()
-      : size = Size(150, 150),
+      : size = Size(250, 200),
         spacing = 100,
         ratio = 0.5,
         isColumnModeActive = false,
         isLabelModeActive = false;
+
   CardCorkboardOptions copyWith({
     Size? size,
     double? ratio,

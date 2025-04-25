@@ -3,6 +3,13 @@
 > [!NOTE]
 > The developer/user must manually add the editor/corkboard/outliner to ensure they meet their application requirements.
 
+> [!IMPORTANT]
+>
+> By now, we are working on the **FreeForm** corkboard, where you can drag and drop your index cards.
+>
+> Current state of the **FreeForm** view:
+> https://github.com/user-attachments/assets/893040de-2f75-4f50-abe2-909714f7677a
+
 Novident give us a corkboard that is the key visual tool for organizing and structuring writing projects, such as novels, essays, screenplays, or research. Its design mimics a traditional corkboard with index cards, where each card can represents a section, chapter, scene, or idea from your project.
 
 ## 💡 What is Corkboard?
@@ -22,6 +29,10 @@ Novident offers three main working modes, which complement Corkboard:
 Classic view of cards organized on a board. 
 
 Ideal for visually planning and reordering sections. You can filter cards using `customFilters` (useful for large projects).
+
+### 🗒️ Free Form Corkboard
+
+Ideal for visually a free reordering sections without offset limits.
 
 ### 🗃️ Outliner (Outline Mode)
 
