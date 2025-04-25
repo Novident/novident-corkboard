@@ -8,6 +8,7 @@
 > By now, we are working on the **FreeForm** corkboard, where you can drag and drop your index cards.
 >
 > Current state of the **FreeForm** view:
+>
 > https://github.com/user-attachments/assets/893040de-2f75-4f50-abe2-909714f7677a
 
 Novident give us a corkboard that is the key visual tool for organizing and structuring writing projects, such as novels, essays, screenplays, or research. Its design mimics a traditional corkboard with index cards, where each card can represents a section, chapter, scene, or idea from your project.
