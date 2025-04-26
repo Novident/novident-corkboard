@@ -123,18 +123,10 @@ class _ExampleWidgetState extends State<ExampleWidget> {
         color: Colors.white,
         child: Column(
           children: [
-            ConstrainedBox(
-              constraints: BoxConstraints(maxWidth: constraints.maxWidth),
-              child: TextField(
-                controller:
-                    TextEditingController(text: (node as Document).name),
-                keyboardType: TextInputType.text,
-              ),
-            ),
+            Text((node as Document).name),
             Divider(),
-            TextField(
-              controller: TextEditingController(text: (node).content),
-            ),
+            const SizedBox(height: 2),
+            Text(node.content),
           ],
         ),
       ),

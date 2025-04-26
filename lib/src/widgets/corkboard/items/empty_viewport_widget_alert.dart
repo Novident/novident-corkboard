@@ -28,7 +28,7 @@ class EmptyViewportWidget extends StatelessWidget {
                   borderRadius: BorderRadius.circular(15),
                 ),
                 child: Text(
-                  'No hay objetos visibles',
+                  'No visible objects',
                   style: TextStyle(color: Colors.white, fontSize: 18),
                 ),
               ),

@@ -9,7 +9,9 @@
 >
 > Current state of the **FreeForm** view:
 >
-> https://github.com/user-attachments/assets/893040de-2f75-4f50-abe2-909714f7677a
+> _If you notice about the X-Y axis Offsets, ignore it. Them are only available when `debugMode` is true._
+>
+> https://github.com/user-attachments/assets/7e4a52f6-2929-4d2e-958c-33cf4a46e7d5
 
 Novident give us a corkboard that is the key visual tool for organizing and structuring writing projects, such as novels, essays, screenplays, or research. Its design mimics a traditional corkboard with index cards, where each card can represents a section, chapter, scene, or idea from your project.
 

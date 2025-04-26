@@ -104,7 +104,7 @@ class _FreeFormCorkboardState extends State<_FreeFormCorkboard> {
       viewportSize.height / scale,
     );
 
-    _isViewportEmptyNotifier.value = !children.any((Node node) {
+    _isViewportEmptyNotifier.value = children.any((Node node) {
       final Rect objectRect = Rect.fromCenter(
         center: (node as OffsetManagerMixin).nodeCardOffset.value,
         width: cardSizes.width,
@@ -186,7 +186,7 @@ class _FreeFormCorkboardState extends State<_FreeFormCorkboard> {
                       if (widget.configuration.debugMode)
                         DebugFreeFormCorkboardPanel(
                           constraints: constraints,
-                          realViewOffset: -_viewOffset,
+                          realViewOffset: _viewOffset,
                           scale: scale,
                           isMovingWorld: _isMovingWorld,
                           viewOffset: viewportListener.viewOffset.value,
