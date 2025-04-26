@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:example/src/domain/entities/document.dart';
 import 'package:example/src/domain/entities/folder.dart';
 import 'package:flutter/material.dart';
@@ -14,7 +16,9 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Canvas Infinito con Objetos',
+      title: 'Example app',
+      debugShowMaterialGrid: false,
+      debugShowCheckedModeBanner: false,
       home: ExampleWidget(),
     );
   }
@@ -30,27 +34,36 @@ class ExampleWidget extends StatefulWidget {
 }
 
 class _ExampleWidgetState extends State<ExampleWidget> {
-  final ValueNotifier<CardCorkboardOptions> _options =
-      ValueNotifier(CardCorkboardOptions.starter());
+  final ValueNotifier<CardCorkboardOptions> _options = ValueNotifier(
+    CardCorkboardOptions.starter(),
+  );
 
   final Folder folder = Folder(
     details: NodeDetails.zero(),
     children: <Node>[
       Document(
         details: NodeDetails.zero(),
-        offset: Offset(100, 100),
+        offset: Offset(0, 0),
+        content: 'Este es un texto en el documento 1',
+        name: 'Documento 1',
       ),
       Document(
         details: NodeDetails.zero(),
-        offset: Offset(130, 130),
+        offset: Offset(30, 30),
+        content: '',
+        name: 'Documento 2',
       ),
       Document(
         details: NodeDetails.zero(),
-        offset: Offset(160, 160),
+        offset: Offset(60, 60),
+        content: 'Este es un texto en el documento 3',
+        name: 'Documento 3',
       ),
       Document(
         details: NodeDetails.zero(),
-        offset: Offset(190, 190),
+        offset: Offset(90, 90),
+        content: 'Este es un texto en el documento 4',
+        name: 'Documento 4',
       ),
     ],
     viewMode: CorkboardViewMode.corkboardFreeform,
@@ -62,37 +75,67 @@ class _ExampleWidgetState extends State<ExampleWidget> {
       appBar: AppBar(title: Text('Free form example')),
       body: NovidentCorkboard(
         node: folder,
+        onSingleView: (node) {
+          return Container();
+        },
         configuration: CorkboardConfiguration(
           debugMode: true,
-          allowZoom: true,
+          allowZoom: Platform.isAndroid || Platform.isIOS,
           cardCorkboardOptions: _options,
-          cardWidget: (
-            BuildContext context,
-            Node node,
-            bool isSelected,
-            BoxConstraints constraints,
-            void Function() selectThis,
-          ) {
-            return DecoratedBox(
-              decoration: isSelected
-                  ? BoxDecoration(
-                      border: Border.fromBorderSide(
-                        BorderSide(
-                          width: 2.0,
-                          color: Colors.blueAccent,
-                        ),
-                      ),
-                    )
-                  : BoxDecoration(),
-              position: DecorationPosition.foreground,
-              child: Container(
-                constraints: constraints,
-                color: Colors.red,
-                child: Text(
-                    'Object: ${(node as OffsetManagerMixin).nodeCardOffset.value}'),
+          maxScale: 0.8,
+          minScale: 0.3,
+          cardWidget: _cardWidget,
+        ),
+      ),
+    );
+  }
+
+  Widget _cardWidget(
+    BuildContext context,
+    Node node,
+    double currentScale,
+    bool isSelected,
+    bool isDragging,
+    BoxConstraints constraints,
+    void Function() selectThis,
+  ) {
+    return DecoratedBox(
+      decoration: isSelected
+          ? BoxDecoration(
+              border: Border.fromBorderSide(
+                BorderSide(
+                  width: 2.0,
+                  color: Colors.blueAccent,
+                ),
               ),
-            );
-          },
+            )
+          : BoxDecoration(
+              border: Border.fromBorderSide(
+                BorderSide(
+                  color: Colors.black.withAlpha(200),
+                  width: 1.0,
+                ),
+              ),
+            ),
+      position: DecorationPosition.foreground,
+      child: Container(
+        constraints: constraints,
+        color: Colors.white,
+        child: Column(
+          children: [
+            ConstrainedBox(
+              constraints: BoxConstraints(maxWidth: constraints.maxWidth),
+              child: TextField(
+                controller:
+                    TextEditingController(text: (node as Document).name),
+                keyboardType: TextInputType.text,
+              ),
+            ),
+            Divider(),
+            TextField(
+              controller: TextEditingController(text: (node).content),
+            ),
+          ],
         ),
       ),
     );

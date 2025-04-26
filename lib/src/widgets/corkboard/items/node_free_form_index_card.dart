@@ -50,20 +50,18 @@ class _NodeFreeFormIndexCardState extends State<NodeFreeFormIndexCard> {
   OffsetManagerMixin get _offsetManager => node as OffsetManagerMixin;
   Offset get _currentOffset => _offsetManager.nodeCardOffset.value;
 
-  Offset _dragStartPosition = Offset.zero;
-
   bool get isDebugModeEnable => widget.configs.debugMode;
 
   Rect toRect(Offset offset, Size size) {
     final Offset screenPos = Offset(
-      (offset.dx - viewOffset.dx) * widget.scale,
-      (offset.dy - viewOffset.dy) * widget.scale,
+      (offset.dx + viewOffset.dx) * widget.scale,
+      (offset.dy + viewOffset.dy) * widget.scale,
     );
 
     return Rect.fromCenter(
       center: screenPos,
-      width: (isDebugModeEnable ? size.width * 3 : size.width) * widget.scale,
-      height: (isDebugModeEnable ? size.height * 3 : size.height) * widget.scale,
+      width: (isDebugModeEnable ? size.width : size.width),
+      height: (isDebugModeEnable ? size.height : size.height),
     );
   }
 
@@ -73,7 +71,7 @@ class _NodeFreeFormIndexCardState extends State<NodeFreeFormIndexCard> {
         FreeFormCardSelectedListener.of(context);
 
     return ListenableBuilder(
-      listenable: Listenable.merge([
+      listenable: Listenable.merge(<Listenable?>[
         _offsetManager.nodeCardOffset,
         listener.selection,
       ]),
@@ -83,6 +81,22 @@ class _NodeFreeFormIndexCardState extends State<NodeFreeFormIndexCard> {
         final Rect rect = toRect(
           nodeOffset,
           cardSize,
+        );
+
+        final Widget child = widget.configs.cardWidget(
+          context,
+          node,
+          widget.scale,
+          value?.id == node.id,
+          isDragging,
+          BoxConstraints.tight(
+            cardSize,
+          ),
+          () {
+            if (value?.id != node.id) {
+              listener.selection.value = node;
+            }
+          },
         );
         return Positioned.fromRect(
           rect: rect,
@@ -97,18 +111,14 @@ class _NodeFreeFormIndexCardState extends State<NodeFreeFormIndexCard> {
               if (value?.id != node.id) {
                 listener.selection.value = node;
               }
-              _dragStartPosition = details.globalPosition;
               startDragging();
             },
             onPanUpdate: (DragUpdateDetails details) {
               if (!isDragging) return;
               if (value == null || value.id != node.id) return;
 
-              final Offset delta =
-                  (details.globalPosition - _dragStartPosition) / widget.scale;
-              _dragStartPosition = details.globalPosition;
-
-              _offsetManager.setCardOffset = _currentOffset + delta;
+              _offsetManager.setCardOffset =
+                  _currentOffset + (details.delta / widget.scale);
             },
             onPanEnd: (DragEndDetails d) => endDragging(),
             onPanDown: (DragDownDetails d) => endDragging(),
@@ -118,30 +128,49 @@ class _NodeFreeFormIndexCardState extends State<NodeFreeFormIndexCard> {
                 if (isDragging) return;
                 listener.selection.value = null;
               },
-              child: Column(
-                children: [
-                  Text('X: ${_currentOffset.dx.toStringAsFixed(3)}'),
-                  Text('Y: ${_currentOffset.dy.toStringAsFixed(3)}'),
-                  Text('Being dragged: ${isDragging ? 'Yes' : 'No'}'),
-                  widget.configs.cardWidget(
-                    context,
-                    node,
-                    value?.id == node.id,
-                    BoxConstraints.tight(
-                      cardSize,
+              child: !isDebugModeEnable
+                  ? child
+                  : Stack(
+                      clipBehavior: Clip.none,
+                      children: <Widget>[
+                        child,
+                        Positioned(
+                          left: 0,
+                          bottom: 220,
+                          child: _buildDebugOverlay(),
+                        ),
+                      ],
                     ),
-                    () {
-                      if (value?.id != node.id) {
-                        listener.selection.value = node;
-                      }
-                    },
-                  ),
-                ],
-              ),
             ),
           ),
         );
       },
+    );
+  }
+
+  Widget _buildDebugOverlay() {
+    return Container(
+      padding: EdgeInsets.all(8),
+      color: Colors.black.withOpacity(0.7),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('X: ${_currentOffset.dx.toStringAsFixed(1)}',
+              style: TextStyle(color: Colors.white)),
+          Text('Y: ${_currentOffset.dy.toStringAsFixed(1)}',
+              style: TextStyle(color: Colors.white)),
+          Text('Size: ${cardSize.width.toInt()}x${cardSize.height.toInt()}',
+              style: TextStyle(color: Colors.white)),
+          Text('Scale: ${widget.scale.toStringAsFixed(2)}x',
+              style: TextStyle(color: Colors.white)),
+          Text('State: ${isDragging ? 'Dragging' : 'Sleeping'}',
+              style: TextStyle(
+                color: isDragging ? Colors.amber : Colors.green,
+                fontWeight: FontWeight.bold,
+              )),
+        ],
+      ),
     );
   }
 }

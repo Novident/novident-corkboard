@@ -6,16 +6,21 @@ class CorkboardConfiguration {
   final double maxScale;
   final double minScale;
   final double initialScale;
+  final Offset? initialViewOffset;
   final bool debugMode;
   final bool allowZoom;
   final bool focusCardOnPress;
   final void Function(Offset offset)? onChangeViewportOffset;
   final void Function(double scale)? onChangeScaleAspect;
+  final void Function(Offset viewport)? onMovingViewportStart;
+  final void Function(Offset viewport)? onMovingViewportEnd;
 
   final Widget Function(
     BuildContext context,
     Node node,
+    double currentScale,
     bool isSelected,
+    bool isDragging,
     BoxConstraints contraints,
     void Function() selectThis,
   ) cardWidget;
@@ -29,6 +34,9 @@ class CorkboardConfiguration {
     required this.allowZoom,
     required this.cardWidget,
     required this.cardCorkboardOptions,
+    this.onMovingViewportEnd,
+    this.onMovingViewportStart,
+    this.initialViewOffset,
     this.onNoAvailableViewForNode,
     this.debugMode = false,
     this.focusCardOnPress = true,
@@ -69,7 +77,7 @@ class CardCorkboardOptions {
   CardCorkboardOptions.starter()
       : size = Size(250, 200),
         spacing = 100,
-        ratio = 0.5,
+        ratio = 0.3,
         isColumnModeActive = false,
         isLabelModeActive = false;
 

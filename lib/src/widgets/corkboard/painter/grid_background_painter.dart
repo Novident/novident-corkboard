@@ -15,19 +15,19 @@ class InfiniteGridBackgroundPainter extends CustomPainter {
   }
 
   void _drawGrid(Canvas canvas, Size size) {
-    const gridStep = 50.0;
-    final gridPaint = Paint()
+    const double gridStep = 50.0;
+    final Paint gridPaint = Paint()
       ..color = Colors.grey[300]!.withAlpha(50)
       ..strokeWidth = 1.0 / scale;
 
-    final worldLeft = viewOffset.dx;
-    final worldTop = viewOffset.dy;
-    final worldRight = worldLeft + size.width / scale;
-    final worldBottom = worldTop + size.height / scale;
+    final double worldLeft = viewOffset.dx;
+    final double worldTop = viewOffset.dy;
+    final double worldRight = worldLeft + size.width / scale;
+    final double worldBottom = worldTop + size.height / scale;
 
-    final firstVerticalLine = (worldLeft ~/ gridStep) * gridStep;
+    final double firstVerticalLine = (worldLeft ~/ gridStep) * gridStep;
     for (double x = firstVerticalLine; x <= worldRight; x += gridStep) {
-      final screenX = (x - worldLeft) * scale;
+      final double screenX = (x - worldLeft) * scale;
       canvas.drawLine(
         Offset(screenX, 0),
         Offset(screenX, size.height),
@@ -35,9 +35,9 @@ class InfiniteGridBackgroundPainter extends CustomPainter {
       );
     }
 
-    final firstHorizontalLine = (worldTop ~/ gridStep) * gridStep;
+    final double firstHorizontalLine = (worldTop ~/ gridStep) * gridStep;
     for (double y = firstHorizontalLine; y <= worldBottom; y += gridStep) {
-      final screenY = (y - worldTop) * scale;
+      final double screenY = (y - worldTop) * scale;
       canvas.drawLine(
         Offset(0, screenY),
         Offset(size.width, screenY),

@@ -8,6 +8,8 @@ class Document extends Node
         CardIndexPositionMixin,
         PersistentViewModeMixin,
         LabelManagerMixin {
+  final String content;
+  final String name;
   final ValueNotifier<String> _label;
   final ValueNotifier<Offset> _offset;
   final ValueNotifier<int> _cardIndex;
@@ -15,6 +17,8 @@ class Document extends Node
   final ValueNotifier<DateTime> _lastCardOffsetModification;
   Document({
     required super.details,
+    required this.content,
+    required this.name,
     int cardIndex = -1,
     String label = '',
     Offset? offset,
@@ -77,6 +81,8 @@ class Document extends Node
       cardIndex: _cardIndex.value,
       label: _label.value,
       offset: _offset.value,
+      content: content,
+      name: name,
       lastCardOffsetModification: _lastCardOffsetModification.value,
       viewMode: _viewMode.value,
     );
@@ -97,6 +103,8 @@ class Document extends Node
       offset: _offset.value,
       viewMode: _viewMode.value,
       cardIndex: _cardIndex.value,
+      content: content,
+      name: name,
       lastCardOffsetModification: _lastCardOffsetModification.value,
     );
   }
@@ -122,6 +130,8 @@ class Document extends Node
       return false;
     }
     return details == other.details &&
+        content == other.content &&
+        name == other.name &&
         _offset == other._offset &&
         _label == other._label &&
         _viewMode == other._viewMode &&
@@ -132,6 +142,8 @@ class Document extends Node
   @override
   int get hashCode => Object.hashAllUnordered([
         details,
+        content,
+        name,
         _offset,
         _label,
         _lastCardOffsetModification,

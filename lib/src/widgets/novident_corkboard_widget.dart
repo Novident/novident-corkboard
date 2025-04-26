@@ -5,10 +5,12 @@ import 'package:novident_nodes/novident_nodes.dart';
 class NovidentCorkboard extends StatefulWidget {
   final Node node;
   final CorkboardConfiguration configuration;
+  final Widget Function(Node node) onSingleView;
   const NovidentCorkboard({
     super.key,
     required this.configuration,
     required this.node,
+    required this.onSingleView,
   });
 
   @override
@@ -39,26 +41,29 @@ class _NovidentCorkboardState extends State<NovidentCorkboard> {
         final ValueNotifier<CorkboardViewMode> viewMode =
             (node as PersistentViewModeMixin).lastViewMode;
         return ValueListenableBuilder<CorkboardViewMode>(
-            valueListenable: viewMode,
-            builder: (BuildContext context, CorkboardViewMode value, _) {
-              if (value.isSingleMode) {}
+          valueListenable: viewMode,
+          builder: (BuildContext context, CorkboardViewMode value, _) {
+            if (value.isSingleMode) {
+              return widget.onSingleView(node);
+            }
 
-              if (node is! NodeContainer) {
-                return widget.configuration.onNoAvailableViewForNode
-                        ?.call(node) ??
-                    Center(
-                      child: Text(
-                        '"${node.runtimeType}" has no '
-                        'subnodes to be showed',
-                      ),
-                    );
-              }
-              if (value.isOutliner) {}
-              return Corkboard(
-                configuration: widget.configuration,
-                node: node,
-              );
-            });
+            if (node is! NodeContainer) {
+              return widget.configuration.onNoAvailableViewForNode
+                      ?.call(node) ??
+                  Center(
+                    child: Text(
+                      '"${node.runtimeType}" has no '
+                      'subnodes to be showed',
+                    ),
+                  );
+            }
+            if (value.isOutliner) {}
+            return Corkboard(
+              configuration: widget.configuration,
+              node: node,
+            );
+          },
+        );
       },
     );
   }
