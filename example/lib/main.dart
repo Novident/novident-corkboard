@@ -1,7 +1,9 @@
 import 'dart:io';
 
+import 'package:appflowy_editor/appflowy_editor.dart' as appf;
 import 'package:example/src/domain/entities/document.dart';
 import 'package:example/src/domain/entities/folder.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:novident_corkboard/novident_corkboard.dart';
 import 'package:novident_nodes/novident_nodes.dart';
@@ -34,6 +36,8 @@ class ExampleWidget extends StatefulWidget {
 }
 
 class _ExampleWidgetState extends State<ExampleWidget> {
+  final appf.EditorState editorState =
+      appf.EditorState.blank(withInitialText: true);
   final ValueNotifier<CardCorkboardOptions> _options = ValueNotifier(
     CardCorkboardOptions.starter(),
   );
@@ -61,7 +65,7 @@ class _ExampleWidgetState extends State<ExampleWidget> {
       ),
       Document(
         details: NodeDetails.zero(),
-        offset: Offset(90, 90),
+        offset: Offset(1120, 700),
         content: 'Este es un texto en el documento 4',
         name: 'Documento 4',
       ),
@@ -73,19 +77,44 @@ class _ExampleWidgetState extends State<ExampleWidget> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text('Free form example')),
-      body: NovidentCorkboard(
-        node: folder,
-        onSingleView: (node) {
-          return Container();
-        },
-        configuration: CorkboardConfiguration(
-          debugMode: true,
-          allowZoom: Platform.isAndroid || Platform.isIOS,
-          cardCorkboardOptions: _options,
-          maxScale: 0.8,
-          minScale: 0.3,
-          cardWidget: _cardWidget,
-        ),
+      body: Column(
+        children: [
+          Row(
+            children: [
+              IconButton(
+                onPressed: () {
+                  folder.lastViewMode.value = CorkboardViewMode.single;
+                },
+                icon: Icon(CupertinoIcons.doc_text),
+              ),
+              IconButton(
+                onPressed: () {
+                  folder.lastViewMode.value =
+                      CorkboardViewMode.corkboardFreeform;
+                },
+                icon: Icon(CupertinoIcons.book),
+              ),
+            ],
+          ),
+          Flexible(
+            child: NovidentCorkboard(
+              node: folder,
+              onSingleView: (node) {
+                return appf.AppFlowyEditor(
+                  editorState: editorState,
+                );
+              },
+              configuration: CorkboardConfiguration(
+                debugMode: true,
+                allowZoom: Platform.isAndroid || Platform.isIOS,
+                cardCorkboardOptions: _options,
+                minScale: 0.8,
+                initialScale: 0.8,
+                cardWidget: _cardWidget,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

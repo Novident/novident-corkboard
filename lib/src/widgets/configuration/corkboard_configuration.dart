@@ -5,11 +5,12 @@ class CorkboardConfiguration {
   // used normally on FreeForm mode
   final double maxScale;
   final double minScale;
-  final double initialScale;
+  final double? initialScale;
   final Offset? initialViewOffset;
   final bool debugMode;
   final bool allowZoom;
   final bool focusCardOnPress;
+  final Map<String, dynamic> labels;
   final void Function(Offset offset)? onChangeViewportOffset;
   final void Function(double scale)? onChangeScaleAspect;
   final void Function(Offset viewport)? onMovingViewportStart;
@@ -34,23 +35,24 @@ class CorkboardConfiguration {
     required this.allowZoom,
     required this.cardWidget,
     required this.cardCorkboardOptions,
+    this.labels = const <String, dynamic>{},
     this.onMovingViewportEnd,
     this.onMovingViewportStart,
     this.initialViewOffset,
     this.onNoAvailableViewForNode,
     this.debugMode = false,
     this.focusCardOnPress = true,
-    this.maxScale = 0.7,
-    this.minScale = 0.5,
-    this.initialScale = 0.5,
+    this.maxScale = 3.5,
+    this.minScale = 1.5,
+    this.initialScale,
     this.onChangeViewportOffset,
     this.onChangeScaleAspect,
   })  : assert(
-            initialScale <= maxScale,
+            initialScale == null || initialScale <= maxScale,
             'initialScale($initialScale) must be less or equals than '
             'the maxScale($maxScale) passed'),
         assert(
-            initialScale >= minScale,
+            initialScale == null || initialScale >= minScale,
             'initialScale($initialScale) must be major or equals than '
             'the minScale($minScale) passed');
 }

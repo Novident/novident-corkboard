@@ -7,18 +7,22 @@ class NodeFreeFormIndexCard extends StatefulWidget {
     super.key,
     required this.node,
     required this.viewOffset,
+    required this.centerOffset,
     required this.scale,
-    required this.onMove,
     required this.options,
     required this.configs,
+    this.onMove,
+    this.onTap,
   });
 
   final CorkboardConfiguration configs;
   final CardCorkboardOptions options;
   final Node node;
   final Offset viewOffset;
+  final Offset centerOffset;
   final double scale;
-  final void Function() onMove;
+  final void Function()? onTap;
+  final void Function()? onMove;
 
   @override
   State<NodeFreeFormIndexCard> createState() => _NodeFreeFormIndexCardState();
@@ -32,6 +36,13 @@ class _NodeFreeFormIndexCardState extends State<NodeFreeFormIndexCard> {
 
   bool isDragging = false;
 
+  OffsetManagerMixin get _offsetManager => node as OffsetManagerMixin;
+
+  Offset get _currentOffset => _offsetManager.nodeCardOffset.value;
+  Offset _startPanOffset = Offset.zero;
+
+  bool get isDebugModeEnable => widget.configs.debugMode;
+
   void startDragging() {
     if (isDragging) return;
     setState(() {
@@ -41,16 +52,12 @@ class _NodeFreeFormIndexCardState extends State<NodeFreeFormIndexCard> {
 
   void endDragging() {
     if (!isDragging) return;
-    widget.onMove();
+    _startPanOffset = Offset.zero;
+    widget.onMove?.call();
     setState(() {
       isDragging = false;
     });
   }
-
-  OffsetManagerMixin get _offsetManager => node as OffsetManagerMixin;
-  Offset get _currentOffset => _offsetManager.nodeCardOffset.value;
-
-  bool get isDebugModeEnable => widget.configs.debugMode;
 
   Rect toRect(Offset offset, Size size) {
     final Offset screenPos = Offset(
@@ -59,7 +66,7 @@ class _NodeFreeFormIndexCardState extends State<NodeFreeFormIndexCard> {
     );
 
     return Rect.fromCenter(
-      center: screenPos,
+      center: screenPos + widget.centerOffset,
       width: (isDebugModeEnable ? size.width : size.width),
       height: (isDebugModeEnable ? size.height : size.height),
     );
@@ -100,47 +107,56 @@ class _NodeFreeFormIndexCardState extends State<NodeFreeFormIndexCard> {
         );
         return Positioned.fromRect(
           rect: rect,
-          child: GestureDetector(
-            onTapDown: (TapDownDetails details) {
-              if (isDragging) return;
-              if (value?.id != node.id) {
-                listener.selection.value = node;
-              }
-            },
-            onPanStart: (DragStartDetails details) {
-              if (value?.id != node.id) {
-                listener.selection.value = node;
-              }
-              startDragging();
-            },
-            onPanUpdate: (DragUpdateDetails details) {
-              if (!isDragging) return;
-              if (value == null || value.id != node.id) return;
+          child: Transform.scale(
+            scale: widget.scale,
+            child: RepaintBoundary(
+              child: GestureDetector(
+                onTap: () {
+                  if (isDragging) return;
+                  if (value?.id != node.id) {
+                    listener.selection.value = node;
+                  }
+                  widget.onTap?.call();
+                },
+                onPanStart: (DragStartDetails details) {
+                  if (value?.id != node.id) {
+                    listener.selection.value = node;
+                  }
+                  _startPanOffset = details.globalPosition;
+                  startDragging();
+                },
+                onPanUpdate: (DragUpdateDetails details) {
+                  if (!isDragging) return;
+                  if (value == null || value.id != node.id) return;
 
-              _offsetManager.setCardOffset =
-                  _currentOffset + (details.delta / widget.scale);
-            },
-            onPanEnd: (DragEndDetails d) => endDragging(),
-            onPanDown: (DragDownDetails d) => endDragging(),
-            onPanCancel: () => endDragging(),
-            child: TextFieldTapRegion(
-              onTapOutside: (PointerDownEvent details) {
-                if (isDragging) return;
-                listener.selection.value = null;
-              },
-              child: !isDebugModeEnable
-                  ? child
-                  : Stack(
-                      clipBehavior: Clip.none,
-                      children: <Widget>[
-                        child,
-                        Positioned(
-                          left: 0,
-                          bottom: 220,
-                          child: _buildDebugOverlay(),
+                  final Offset delta =
+                      (details.globalPosition - _startPanOffset) / widget.scale;
+                  _startPanOffset = details.globalPosition;
+                  _offsetManager.setCardOffset = _currentOffset + delta;
+                },
+                onPanEnd: (DragEndDetails d) => endDragging(),
+                onPanDown: (DragDownDetails d) => endDragging(),
+                onPanCancel: () => endDragging(),
+                child: TextFieldTapRegion(
+                  onTapOutside: (PointerDownEvent details) {
+                    if (isDragging) return;
+                    listener.selection.value = null;
+                  },
+                  child: !isDebugModeEnable
+                      ? child
+                      : Stack(
+                          clipBehavior: Clip.none,
+                          children: <Widget>[
+                            child,
+                            Positioned(
+                              left: 0,
+                              bottom: 220,
+                              child: _buildDebugOverlay(value),
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
+                ),
+              ),
             ),
           ),
         );
@@ -148,21 +164,26 @@ class _NodeFreeFormIndexCardState extends State<NodeFreeFormIndexCard> {
     );
   }
 
-  Widget _buildDebugOverlay() {
+  Widget _buildDebugOverlay(Node? selection) {
     return Container(
       padding: EdgeInsets.all(8),
-      color: Colors.black.withOpacity(0.7),
+      color: Colors.black.withAlpha(170),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          Text('_Id: ${node.id.substring(0, 6)}',
+              style: TextStyle(color: Colors.white)),
+          Text('Selected: ${selection?.id == node.id ? 'Yes' : 'No'}',
+              style: TextStyle(color: Colors.white)),
           Text('X: ${_currentOffset.dx.toStringAsFixed(1)}',
               style: TextStyle(color: Colors.white)),
           Text('Y: ${_currentOffset.dy.toStringAsFixed(1)}',
               style: TextStyle(color: Colors.white)),
           Text('Size: ${cardSize.width.toInt()}x${cardSize.height.toInt()}',
               style: TextStyle(color: Colors.white)),
-          Text('Scale: ${widget.scale.toStringAsFixed(2)}x',
+          Text(
+              'Actual size: ${(cardSize.width * widget.scale).toStringAsFixed(1)}x${(cardSize.height * widget.scale).toStringAsFixed(1)}',
               style: TextStyle(color: Colors.white)),
           Text('State: ${isDragging ? 'Dragging' : 'Sleeping'}',
               style: TextStyle(
