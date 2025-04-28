@@ -11,7 +11,7 @@ class Document extends Node
   final String content;
   final String name;
   final ValueNotifier<String> _label;
-  final ValueNotifier<Offset> _offset;
+  final ValueNotifier<Offset?> _offset;
   final ValueNotifier<int> _cardIndex;
   final ValueNotifier<CorkboardViewMode> _viewMode;
   final ValueNotifier<DateTime> _lastCardOffsetModification;
@@ -24,7 +24,7 @@ class Document extends Node
     Offset? offset,
     DateTime? lastCardOffsetModification,
     CorkboardViewMode? viewMode,
-  })  : _offset = ValueNotifier(offset ?? Offset.zero),
+  })  : _offset = ValueNotifier(offset),
         _viewMode = ValueNotifier(viewMode ?? CorkboardViewMode.single),
         _label = ValueNotifier(label),
         _cardIndex = ValueNotifier(cardIndex),
@@ -62,7 +62,7 @@ class Document extends Node
   ValueNotifier<int> get nodeCardIndex => _cardIndex;
 
   @override
-  ValueNotifier<Offset> get nodeCardOffset => _offset;
+  ValueNotifier<Offset?> get nodeCardOffset => _offset;
 
   @override
   ValueNotifier<String> get nodeLabel => _label;

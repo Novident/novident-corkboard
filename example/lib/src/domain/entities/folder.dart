@@ -8,6 +8,8 @@ class Folder extends NodeContainer
         CardIndexPositionMixin,
         PersistentViewModeMixin,
         LabelManagerMixin {
+  final String name;
+  final String synopsis;
   final ValueNotifier<String> _label;
   final ValueNotifier<Offset> _offset;
   final ValueNotifier<int> _cardIndex;
@@ -16,6 +18,8 @@ class Folder extends NodeContainer
   Folder({
     required super.details,
     required super.children,
+    required this.name,
+    required this.synopsis,
     int cardIndex = -1,
     String label = '',
     Offset? offset,
@@ -98,7 +102,7 @@ class Folder extends NodeContainer
   ValueNotifier<int> get nodeCardIndex => _cardIndex;
 
   @override
-  ValueNotifier<Offset> get nodeCardOffset => _offset;
+  ValueNotifier<Offset?> get nodeCardOffset => _offset;
 
   @override
   ValueNotifier<String> get nodeLabel => _label;
@@ -118,6 +122,8 @@ class Folder extends NodeContainer
       cardIndex: _cardIndex.value,
       label: _label.value,
       offset: _offset.value,
+      synopsis: synopsis,
+      name: name,
       lastCardOffsetModification: _lastCardOffsetModification.value,
       viewMode: _viewMode.value,
     );
@@ -127,10 +133,14 @@ class Folder extends NodeContainer
   Folder copyWith({
     NodeDetails? details,
     List<Node>? children,
+    String? name,
+    String? synopsis,
   }) {
     return Folder(
       details: details ?? this.details,
       children: children ?? this.children,
+      synopsis: synopsis ?? this.synopsis,
+      name: name ?? this.name,
       label: _label.value,
       offset: _offset.value,
       viewMode: _viewMode.value,
@@ -163,9 +173,21 @@ class Folder extends NodeContainer
         _offset == other._offset &&
         _label == other._label &&
         _viewMode == other._viewMode &&
+        name == other.name &&
+        synopsis == other.synopsis &&
         _cardIndex == other._cardIndex;
   }
 
   @override
-  int get hashCode => throw UnimplementedError();
+  int get hashCode => Object.hashAllUnordered(
+        [
+          details,
+          _offset,
+          _label,
+          _viewMode,
+          name,
+          synopsis,
+          _cardIndex,
+        ],
+      );
 }

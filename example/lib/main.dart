@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:appflowy_editor/appflowy_editor.dart' as appf;
 import 'package:example/src/domain/entities/document.dart';
 import 'package:example/src/domain/entities/folder.dart';
+import 'package:example/src/ui/cards/card_widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:novident_corkboard/novident_corkboard.dart';
@@ -43,29 +44,27 @@ class _ExampleWidgetState extends State<ExampleWidget> {
   );
 
   final Folder folder = Folder(
+    name: 'Root folder',
+    synopsis: '',
     details: NodeDetails.zero(),
     children: <Node>[
       Document(
         details: NodeDetails.zero(),
-        offset: Offset(0, 0),
         content: 'Este es un texto en el documento 1',
         name: 'Documento 1',
       ),
       Document(
         details: NodeDetails.zero(),
-        offset: Offset(30, 30),
         content: '',
         name: 'Documento 2',
       ),
       Document(
         details: NodeDetails.zero(),
-        offset: Offset(60, 60),
         content: 'Este es un texto en el documento 3',
         name: 'Documento 3',
       ),
       Document(
         details: NodeDetails.zero(),
-        offset: Offset(1120, 700),
         content: 'Este es un texto en el documento 4',
         name: 'Documento 4',
       ),
@@ -99,6 +98,17 @@ class _ExampleWidgetState extends State<ExampleWidget> {
           Flexible(
             child: NovidentCorkboard(
               node: folder,
+              filterViewMode: (node, value) {
+                if (value.isSingleMode && node is Folder) {
+                  return false;
+                }
+
+                if (!value.isSingleMode && node is! NodeContainer) {
+                  return false;
+                }
+
+                return true;
+              },
               onSingleView: (node) {
                 return appf.AppFlowyEditor(
                   editorState: editorState,
@@ -110,54 +120,27 @@ class _ExampleWidgetState extends State<ExampleWidget> {
                 cardCorkboardOptions: _options,
                 minScale: 0.8,
                 initialScale: 0.8,
-                cardWidget: _cardWidget,
+                cardWidget: (
+                  BuildContext context,
+                  Node node,
+                  double currentScale,
+                  bool isSelected,
+                  bool isDragging,
+                  BoxConstraints constraints,
+                  void Function() selectThis,
+                ) =>
+                    NodeCardWidget(
+                  node: node,
+                  currentScale: currentScale,
+                  isSelected: isSelected,
+                  isDragging: isDragging,
+                  constraints: constraints,
+                  selectThis: selectThis,
+                ),
               ),
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _cardWidget(
-    BuildContext context,
-    Node node,
-    double currentScale,
-    bool isSelected,
-    bool isDragging,
-    BoxConstraints constraints,
-    void Function() selectThis,
-  ) {
-    return DecoratedBox(
-      decoration: isSelected
-          ? BoxDecoration(
-              border: Border.fromBorderSide(
-                BorderSide(
-                  width: 2.0,
-                  color: Colors.blueAccent,
-                ),
-              ),
-            )
-          : BoxDecoration(
-              border: Border.fromBorderSide(
-                BorderSide(
-                  color: Colors.black.withAlpha(200),
-                  width: 1.0,
-                ),
-              ),
-            ),
-      position: DecorationPosition.foreground,
-      child: Container(
-        constraints: constraints,
-        color: Colors.white,
-        child: Column(
-          children: [
-            Text((node as Document).name),
-            Divider(),
-            const SizedBox(height: 2),
-            Text(node.content),
-          ],
-        ),
       ),
     );
   }
