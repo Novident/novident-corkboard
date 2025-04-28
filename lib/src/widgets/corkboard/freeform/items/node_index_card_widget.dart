@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:novident_corkboard/novident_corkboard.dart';
 import 'package:novident_nodes/novident_nodes.dart';
 
-class NodeFreeFormIndexCard extends StatefulWidget {
-  const NodeFreeFormIndexCard({
+class NodeIndexCardWidget extends StatefulWidget {
+  const NodeIndexCardWidget({
     super.key,
     required this.node,
     required this.viewOffset,
-    required this.centerOffset,
+    required this.effectiveCompensationOffset,
     required this.scale,
     required this.options,
     required this.configs,
@@ -19,71 +19,48 @@ class NodeFreeFormIndexCard extends StatefulWidget {
   final CardCorkboardOptions options;
   final Node node;
   final Offset viewOffset;
-  final Offset centerOffset;
+  final Offset effectiveCompensationOffset;
   final double scale;
   final void Function()? onTap;
   final void Function()? onMove;
 
   @override
-  State<NodeFreeFormIndexCard> createState() => _NodeFreeFormIndexCardState();
+  State<NodeIndexCardWidget> createState() => _NodeFreeFormIndexCardState();
 }
 
-class _NodeFreeFormIndexCardState extends State<NodeFreeFormIndexCard> {
-  Node get node => widget.node;
-  CardCorkboardOptions get options => widget.options;
-  Size get cardSize => options.size;
-  Offset get viewOffset => widget.viewOffset;
+class _NodeFreeFormIndexCardState extends State<NodeIndexCardWidget> {
+  late final FreeFormCardSelectedListener listener =
+      FreeFormCardSelectedListener.of(context);
+
+  Offset _startPanOffset = Offset.zero;
 
   bool isDragging = false;
 
   OffsetManagerMixin get _offsetManager => node as OffsetManagerMixin;
 
-  Offset get _currentOffset => _offsetManager.nodeCardOffset.value;
-  Offset _startPanOffset = Offset.zero;
+  CardCorkboardOptions get options => widget.options;
+
+  Node get node => widget.node;
+
+  Size get cardSize => options.size;
+
+  Offset get viewOffset => widget.viewOffset;
+
+  Offset get _currentOffset =>
+      _offsetManager.nodeCardOffset.value ?? Offset.zero;
 
   bool get isDebugModeEnable => widget.configs.debugMode;
 
-  void startDragging() {
-    if (isDragging) return;
-    setState(() {
-      isDragging = true;
-    });
-  }
-
-  void endDragging() {
-    if (!isDragging) return;
-    _startPanOffset = Offset.zero;
-    widget.onMove?.call();
-    setState(() {
-      isDragging = false;
-    });
-  }
-
-  Rect toRect(Offset offset, Size size) {
-    final Offset screenPos = Offset(
-      (offset.dx + viewOffset.dx) * widget.scale,
-      (offset.dy + viewOffset.dy) * widget.scale,
-    );
-
-    return Rect.fromCenter(
-      center: screenPos + widget.centerOffset,
-      width: (isDebugModeEnable ? size.width : size.width),
-      height: (isDebugModeEnable ? size.height : size.height),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
-    final FreeFormCardSelectedListener listener =
-        FreeFormCardSelectedListener.of(context);
-
     return ListenableBuilder(
       listenable: Listenable.merge(<Listenable?>[
         _offsetManager.nodeCardOffset,
         listener.selection,
       ]),
       builder: (BuildContext context, Widget? _) {
-        final Offset nodeOffset = _offsetManager.nodeCardOffset.value;
+        final Offset nodeOffset =
+            _offsetManager.nodeCardOffset.value ?? Offset.zero;
         final Node? value = listener.selection.value;
         final Rect rect = toRect(
           nodeOffset,
@@ -131,7 +108,9 @@ class _NodeFreeFormIndexCardState extends State<NodeFreeFormIndexCard> {
 
                   final Offset delta =
                       (details.globalPosition - _startPanOffset) / widget.scale;
+
                   _startPanOffset = details.globalPosition;
+
                   _offsetManager.setCardOffset = _currentOffset + delta;
                 },
                 onPanEnd: (DragEndDetails d) => endDragging(),
@@ -171,7 +150,7 @@ class _NodeFreeFormIndexCardState extends State<NodeFreeFormIndexCard> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
+        children: <Widget>[
           Text('_Id: ${node.id.substring(0, 6)}',
               style: TextStyle(color: Colors.white)),
           Text('Selected: ${selection?.id == node.id ? 'Yes' : 'No'}',
@@ -192,6 +171,35 @@ class _NodeFreeFormIndexCardState extends State<NodeFreeFormIndexCard> {
               )),
         ],
       ),
+    );
+  }
+
+  void startDragging() {
+    if (isDragging) return;
+    setState(() {
+      isDragging = true;
+    });
+  }
+
+  void endDragging() {
+    if (!isDragging) return;
+    _startPanOffset = Offset.zero;
+    widget.onMove?.call();
+    setState(() {
+      isDragging = false;
+    });
+  }
+
+  Rect toRect(Offset offset, Size size) {
+    final Offset screenPos = Offset(
+      (offset.dx + viewOffset.dx) * widget.scale,
+      (offset.dy + viewOffset.dy) * widget.scale,
+    );
+
+    return Rect.fromCenter(
+      center: screenPos + widget.effectiveCompensationOffset,
+      width: size.width,
+      height: size.height,
     );
   }
 }

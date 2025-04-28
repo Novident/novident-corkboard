@@ -19,8 +19,13 @@ mixin CoordinateSystemMixin<T extends StatefulWidget> on State<T> {
     notify(
       children.any(
         (Node node) {
-          final bool isVisible = viewportRange.overlapsWithArea(
-              (node as OffsetManagerMixin).nodeCardOffset.value, cardSize);
+          final Offset nodeOffset =
+              (node as OffsetManagerMixin).nodeCardOffset.value!;
+          final bool isVisible =
+              viewportRange.overlapsWithArea(nodeOffset, cardSize) ||
+                  viewportRange.containsPosition(
+                    nodeOffset,
+                  );
           return isVisible;
         },
       ),
@@ -28,7 +33,7 @@ mixin CoordinateSystemMixin<T extends StatefulWidget> on State<T> {
   }
 
   bool isNodeVisible(Node node) {
-    final Offset nodePos = (node as OffsetManagerMixin).nodeCardOffset.value;
+    final Offset nodePos = (node as OffsetManagerMixin).nodeCardOffset.value!;
     final bool isVisible = viewportRange.containsPosition(nodePos);
     return isVisible;
   }
@@ -47,7 +52,7 @@ mixin CoordinateSystemMixin<T extends StatefulWidget> on State<T> {
 
     for (final Node node in children) {
       final Offset nodeOffset =
-          (node as OffsetManagerMixin).nodeCardOffset.value;
+          (node as OffsetManagerMixin).nodeCardOffset.value!;
       final double distance = (nodeOffset - viewportCenter).distance;
 
       if (distance < minDistance && distance < maxDistance) {
@@ -64,7 +69,7 @@ mixin CoordinateSystemMixin<T extends StatefulWidget> on State<T> {
 
     if (closestChild != null) {
       final Offset childWorldPos =
-          (closestChild as OffsetManagerMixin).nodeCardOffset.value;
+          (closestChild as OffsetManagerMixin).nodeCardOffset.value!;
 
       return Offset(
         childWorldPos.dx - (viewportContraints.width / 2) / scale,

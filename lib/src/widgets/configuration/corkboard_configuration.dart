@@ -1,4 +1,5 @@
 import 'package:flutter/widgets.dart';
+import 'package:novident_corkboard/src/widgets/configuration/viewport_configuration.dart';
 import 'package:novident_nodes/novident_nodes.dart';
 
 class CorkboardConfiguration {
@@ -10,11 +11,9 @@ class CorkboardConfiguration {
   final bool debugMode;
   final bool allowZoom;
   final bool focusCardOnPress;
+  final List<String>? outlinerColumns;
+  final Widget Function(Node node, String outlinerColumnKey)? buildOutlinerCell;
   final Map<String, dynamic> labels;
-  final void Function(Offset offset)? onChangeViewportOffset;
-  final void Function(double scale)? onChangeScaleAspect;
-  final void Function(Offset viewport)? onMovingViewportStart;
-  final void Function(Offset viewport)? onMovingViewportEnd;
 
   final Widget Function(
     BuildContext context,
@@ -22,7 +21,7 @@ class CorkboardConfiguration {
     double currentScale,
     bool isSelected,
     bool isDragging,
-    BoxConstraints contraints,
+    BoxConstraints constraints,
     void Function() selectThis,
   ) cardWidget;
 
@@ -30,14 +29,16 @@ class CorkboardConfiguration {
   final Widget Function(Node node)? onNoAvailableViewForNode;
 
   final ValueNotifier<CardCorkboardOptions> cardCorkboardOptions;
+  final ViewportConfiguration viewportConfiguration;
 
   CorkboardConfiguration({
     required this.allowZoom,
     required this.cardWidget,
     required this.cardCorkboardOptions,
+    this.viewportConfiguration = const ViewportConfiguration(),
+    this.buildOutlinerCell,
+    this.outlinerColumns,
     this.labels = const <String, dynamic>{},
-    this.onMovingViewportEnd,
-    this.onMovingViewportStart,
     this.initialViewOffset,
     this.onNoAvailableViewForNode,
     this.debugMode = false,
@@ -45,8 +46,6 @@ class CorkboardConfiguration {
     this.maxScale = 3.5,
     this.minScale = 1.5,
     this.initialScale,
-    this.onChangeViewportOffset,
-    this.onChangeScaleAspect,
   })  : assert(
             initialScale == null || initialScale <= maxScale,
             'initialScale($initialScale) must be less or equals than '

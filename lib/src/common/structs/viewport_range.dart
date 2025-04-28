@@ -27,17 +27,6 @@ class ViewportRange {
   bool overlapsWithArea(Offset center, Size size) {
     final double halfWidth = size.width / scale;
     final double halfHeight = size.height / scale;
-    print('Object offset: $center with Size: $size');
-    print('Half: ${Size(halfWidth, halfHeight)}');
-    print('VisibleStartX: ${visibleStartX}');
-    print('VisibleEndX: ${visibleEndX}');
-    print('VisibleStartY: ${visibleStartY}');
-    print('VisibleEndY: ${visibleEndY}');
-    print('Available size: $viewportSize but moved to $viewOffset');
-    print('1. compute result: ${halfWidth + center.dx}');
-    print('2. compute result: ${halfWidth - center.dx}');
-    print('3. compute result: ${center.dy + halfHeight}');
-    print('4. compute result: ${center.dy - halfHeight}');
     if (halfWidth + center.dx >= visibleStartX &&
         halfWidth - center.dx <= visibleEndX) {
       return true;

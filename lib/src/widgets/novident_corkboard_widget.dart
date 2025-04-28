@@ -5,13 +5,22 @@ import 'package:novident_nodes/novident_nodes.dart';
 class NovidentCorkboard extends StatefulWidget {
   final Node node;
   final CorkboardConfiguration configuration;
+  final bool Function(Node node, CorkboardViewMode viewMode) filterViewMode;
   final Widget Function(Node node) onSingleView;
   const NovidentCorkboard({
     super.key,
     required this.configuration,
     required this.node,
     required this.onSingleView,
+    this.filterViewMode = _defaultFilterViewMode,
   });
+
+  static bool _defaultFilterViewMode(Node node, CorkboardViewMode mode) {
+    if (node is! NodeContainer && mode != CorkboardViewMode.single) {
+      return false;
+    }
+    return true;
+  }
 
   @override
   State<NovidentCorkboard> createState() => _NovidentCorkboardState();
@@ -43,11 +52,7 @@ class _NovidentCorkboardState extends State<NovidentCorkboard> {
         return ValueListenableBuilder<CorkboardViewMode>(
           valueListenable: viewMode,
           builder: (BuildContext context, CorkboardViewMode value, _) {
-            if (value.isSingleMode) {
-              return widget.onSingleView(node);
-            }
-
-            if (node is! NodeContainer) {
+            if (!widget.filterViewMode(node, value)) {
               return widget.configuration.onNoAvailableViewForNode
                       ?.call(node) ??
                   Center(
@@ -56,6 +61,9 @@ class _NovidentCorkboardState extends State<NovidentCorkboard> {
                       'subnodes to be showed',
                     ),
                   );
+            }
+            if (value.isSingleMode) {
+              return widget.onSingleView(node);
             }
             if (value.isOutliner) {}
             return Corkboard(
